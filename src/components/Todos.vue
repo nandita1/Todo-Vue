@@ -2,7 +2,7 @@
   <div>
     <ul v-if="todos.length > 0">
       <li v-for="(todo,i) in todos" :key="i">
-        <div>{{todo}}</div>
+        <router-link :to="'/todo/' + i" tag="div" :key="i">{{todo}}</router-link>
         <span>
           <img src="../assets/dustbin.svg" @click="deleteTodo(i)" />
         </span>
@@ -13,8 +13,17 @@
 </template>
 
 <script>
+import { eventBus } from "../main";
 export default {
-  props: ["todos"],
+  data() {
+    return {
+      todos: []
+    };
+  },
+  created() {
+    console.log(eventBus.todos);
+    this.todos = eventBus.todos;
+  },
   methods: {
     deleteTodo(index) {
       this.$emit("todoDeleted", index);
@@ -29,6 +38,7 @@ li {
   display: flex;
   justify-content: space-between;
   margin: 20px 0;
+  cursor: pointer;
 }
 .noTodos {
   text-align: center;
