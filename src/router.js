@@ -16,5 +16,6 @@ export default new Router({
             name: "todo",
             component: Todo
         }
-    ]
+    ],
+    mode: 'history'
 });
