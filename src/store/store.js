@@ -7,6 +7,21 @@ import {
 
 Vue.use(Vuex);
 
+
+function compare(a, b) {
+  // Use toUpperCase() to ignore character casing
+  const idA = a.id;
+  const idB = b.id;
+
+  let comparison = 0;
+  if (idA > idB) {
+    comparison = 1;
+  } else if (idA < idB) {
+    comparison = -1;
+  }
+  return comparison * -1;
+}
+
 export const store = new Vuex.Store({
   state: {
     todos: [],
@@ -33,22 +48,18 @@ export const store = new Vuex.Store({
         completed: false,
         loading: true
       };
-      state.todos.push(newTodo);
+      state.todos.unshift(newTodo);
     },
-    deleteTodo: (state, id) => {
-      for (let i = 0; i < state.todos.length; i++) {
-        if (state.todos[i].id == id) {
-          state.todos.splice(i, 1);
-          return;
-        }
-      }
+    deleteTodo: (state, index) => {
+      state.todos.splice(index, 1);
     },
     fetchTodos: (state, payload) => {
+      payload.sort(compare)
       state.todos = [...payload];
-      console.log(state.todos);
+      //console.log(state.todos);
     },
     updateTodo: (state, payload) => {
-      Vue.set(state.todos, state.todos.length - 1, {
+      Vue.set(state.todos, 0, {
         ...payload,
         loading: false
       })
@@ -93,14 +104,14 @@ export const store = new Vuex.Store({
     },
     deleteTodo: ({
       commit
-    }, id) => {
-      console.log(id);
-      fetch("https://rocky-anchorage-71862.herokuapp.com/todos/" + id, {
+    }, obj) => {
+      console.log(obj);
+      commit("deleteTodo", obj.index);
+      fetch("https://rocky-anchorage-71862.herokuapp.com/todos/" + obj.id, {
           method: "DELETE",
         })
         .then((response) => response.json())
         .then((response) => {
-          commit("deleteTodo", id);
           console.log(response);
         })
         .catch((err) => {

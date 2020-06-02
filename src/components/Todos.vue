@@ -15,7 +15,7 @@
           <img
             :style="todo.loading ? 'pointer-events: none': ''"
             src="../assets/dustbin.svg"
-            @click="deleteTodo(todo.id)"
+            @click="deleteTodo({id: todo.id, index: i})"
           />
         </span>
       </li>
@@ -31,8 +31,9 @@ export default {
     ...mapGetters(["todos"])
   },
   methods: {
-    deleteTodo(id) {
-      this.$store.dispatch("deleteTodo", id);
+    deleteTodo(obj) {
+      console.log(obj);
+      this.$store.dispatch("deleteTodo", obj);
     }
   }
 };
