@@ -5,7 +5,11 @@
 </template>
 
 <script>
+  export default {
+    mounted() {
+      this.$store.dispatch("fetchTodos");
+    },
+  };
 </script>
 
-<style>
-</style>
+<style></style>

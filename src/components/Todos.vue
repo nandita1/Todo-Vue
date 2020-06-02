@@ -28,7 +28,10 @@
   };
 </script>
 
-<style>
+<style scoped>
+  ul {
+    padding: 0;
+  }
   li {
     list-style: none;
     display: flex;
@@ -48,7 +51,9 @@
     flex: 1;
     text-decoration: none;
   }
-  .link:visited {
+  .link:visited,
+  .link:active,
+  .link:link {
     color: black;
   }
 </style>

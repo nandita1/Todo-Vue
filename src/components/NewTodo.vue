@@ -34,7 +34,7 @@
   };
 </script>
 
-<style>
+<style scoped>
   .form {
     margin: 20px 0;
   }

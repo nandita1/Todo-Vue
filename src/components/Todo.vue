@@ -1,6 +1,12 @@
 <template>
   <div>
-    <h1>{{ getTodo(this.$route.params.id) }}</h1>
+    <h1>{{ getTodo(this.$route.params.id).title }}</h1>
+    <p>
+      Status:
+      {{
+        getTodo(this.$route.params.id).completed ? "Completed" : "Not Completed"
+      }}
+    </p>
   </div>
 </template>
 <script>
