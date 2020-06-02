@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1>{{ getTodo(this.$route.params.id).title }}</h1>
+    <h1>{{ getTodo(this.$route.params.id).name }}</h1>
     <p>
       Status:
       {{

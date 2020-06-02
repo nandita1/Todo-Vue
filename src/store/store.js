@@ -9,38 +9,77 @@ export const store = new Vuex.Store({
     todos: [],
   },
   getters: {
-    todos: (state) => state.todos.map((todo) => todo.title),
-    getTodo: (state) => (index) => state.todos[index],
+    todos: (state) => state.todos,
+    getTodo: (state) => (id) => {
+      //console.log(Array.from(state.todos))
+      for (let todo of Array.from(state.todos)) {
+        //console.log(todo.id)
+        if (todo.id == id) {
+          //console.log(id)
+          return todo;
+        }
+      }
+      //return state.todos.find(todo => todo.id === id)
+    },
   },
   mutations: {
     addTodo: (state, payload) => {
-      state.todos.push({
-        title: payload,
-        completed: false,
-      });
+      state.todos.push(payload);
     },
-    deleteTodo: (state, index) => {
-      state.todos.splice(index, 1);
+    deleteTodo: (state, id) => {
+      for (let i = 0; i < state.todos.length; i++) {
+        if (state.todos[i].id == id) {
+          state.todos.splice(i, 1);
+          return;
+        }
+      }
     },
     fetchTodos: (state, payload) => {
-      state.todos = [
-        ...payload.slice(0, 10).map((todo) => {
-          return {
-            title: todo.title,
-            completed: todo.completed,
-          };
-        }),
-      ];
+      state.todos = [...payload];
       console.log(state.todos);
     },
   },
   actions: {
     fetchTodos: ({ commit }) => {
       axios
-        .get("http://jsonplaceholder.typicode.com/todos")
+        .get("https://rocky-anchorage-71862.herokuapp.com/todos")
         .then((response) => {
           commit("fetchTodos", response.data);
           //console.log(response.data);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    },
+    addTodo: ({ commit }, payload) => {
+      fetch("https://rocky-anchorage-71862.herokuapp.com/todos", {
+        method: "POST",
+        body: JSON.stringify({
+          name: payload,
+          completed: false,
+        }),
+        headers: {
+          "Content-Type": "application/json",
+          // 'Content-Type': 'application/x-www-form-urlencoded',
+        },
+      })
+        .then((response) => response.json())
+        .then((response) => {
+          commit("addTodo", response);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    },
+    deleteTodo: ({ commit }, id) => {
+      //console.log(id);
+      fetch("https://rocky-anchorage-71862.herokuapp.com/todos/" + id, {
+        method: "DELETE",
+      })
+        .then((response) => response.json())
+        .then((response) => {
+          commit("deleteTodo", id);
+          console.log(response);
         })
         .catch((err) => {
           console.log(err);
