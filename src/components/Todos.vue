@@ -2,13 +2,21 @@
   <div>
     <ul v-if="todos.length > 0">
       <li v-for="(todo, i) in todos" :key="i">
-        <router-link :to="'/todo/' + todo.id" class="link" :key="i">
+        <router-link
+          :to="'/todo/' + todo.id"
+          :class="[todo.loading ? 'disabled' : 'link']"
+          :key="i"
+        >
           {{
           todo.name
           }}
         </router-link>
         <span>
-          <img src="../assets/dustbin.svg" @click="deleteTodo(todo.id)" />
+          <img
+            :style="todo.loading ? 'pointer-events: none': ''"
+            src="../assets/dustbin.svg"
+            @click="deleteTodo(todo.id)"
+          />
         </span>
       </li>
     </ul>
@@ -49,7 +57,8 @@ img {
   height: 20px;
   cursor: pointer;
 }
-.link {
+.link,
+.disabled {
   flex: 1;
   text-decoration: none;
 }
@@ -57,5 +66,10 @@ img {
 .link:active,
 .link:link {
   color: black;
+}
+.disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+  pointer-events: none;
 }
 </style>

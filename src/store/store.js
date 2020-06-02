@@ -1,6 +1,9 @@
 import Vue from "vue";
 import Vuex from "vuex";
 import axios from "axios";
+import {
+  v4 as uuidv4
+} from "uuid";
 
 Vue.use(Vuex);
 
@@ -20,11 +23,17 @@ export const store = new Vuex.Store({
         }
       }
       //return state.todos.find(todo => todo.id === id)
-    },
+    }
   },
   mutations: {
     addTodo: (state, payload) => {
-      state.todos.push(payload);
+      const newTodo = {
+        id: uuidv4(),
+        name: payload,
+        completed: false,
+        loading: true
+      };
+      state.todos.push(newTodo);
     },
     deleteTodo: (state, id) => {
       for (let i = 0; i < state.todos.length; i++) {
@@ -38,9 +47,17 @@ export const store = new Vuex.Store({
       state.todos = [...payload];
       console.log(state.todos);
     },
+    updateTodo: (state, payload) => {
+      Vue.set(state.todos, state.todos.length - 1, {
+        ...payload,
+        loading: false
+      })
+    },
   },
   actions: {
-    fetchTodos: ({ commit }) => {
+    fetchTodos: ({
+      commit
+    }) => {
       axios
         .get("https://rocky-anchorage-71862.herokuapp.com/todos")
         .then((response) => {
@@ -51,31 +68,36 @@ export const store = new Vuex.Store({
           console.log(err);
         });
     },
-    addTodo: ({ commit }, payload) => {
+    addTodo: ({
+      commit
+    }, payload) => {
+      commit("addTodo", payload);
       fetch("https://rocky-anchorage-71862.herokuapp.com/todos", {
-        method: "POST",
-        body: JSON.stringify({
-          name: payload,
-          completed: false,
-        }),
-        headers: {
-          "Content-Type": "application/json",
-          // 'Content-Type': 'application/x-www-form-urlencoded',
-        },
-      })
+          method: "POST",
+          body: JSON.stringify({
+            name: payload,
+            completed: false,
+          }),
+          headers: {
+            "Content-Type": "application/json",
+            // 'Content-Type': 'application/x-www-form-urlencoded',
+          },
+        })
         .then((response) => response.json())
         .then((response) => {
-          commit("addTodo", response);
+          commit("updateTodo", response);
         })
         .catch((err) => {
           console.log(err);
         });
     },
-    deleteTodo: ({ commit }, id) => {
-      //console.log(id);
+    deleteTodo: ({
+      commit
+    }, id) => {
+      console.log(id);
       fetch("https://rocky-anchorage-71862.herokuapp.com/todos/" + id, {
-        method: "DELETE",
-      })
+          method: "DELETE",
+        })
         .then((response) => response.json())
         .then((response) => {
           commit("deleteTodo", id);
