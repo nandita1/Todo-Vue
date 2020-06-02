@@ -68,6 +68,7 @@ img {
   color: black;
 }
 .disabled {
+  color: black;
   cursor: not-allowed;
   opacity: 0.5;
   pointer-events: none;
