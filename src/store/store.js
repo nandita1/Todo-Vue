@@ -88,7 +88,7 @@ export const store = new Vuex.Store({
         .get("https://rocky-anchorage-71862.herokuapp.com/todos")
         .then((response) => {
           commit("fetchTodos", response.data);
-          //console.log(response.data);
+          console.log(response.data);
         })
         .catch((err) => {
           console.log(err);
@@ -96,7 +96,7 @@ export const store = new Vuex.Store({
     },
     addTodo: ({ commit }, payload) => {
       commit("addTodo", payload);
-      fetch("http://rocky-anchorage-71862.herokuapp.com/todos", {
+      fetch("https://rocky-anchorage-71862.herokuapp.com/todos", {
         method: "POST",
         body: JSON.stringify({
           name: payload,
@@ -139,7 +139,7 @@ export const store = new Vuex.Store({
     },
     retry: ({ commit }, obj) => {
       commit("retry", obj);
-      fetch("http://rocky-anchorage-71862.herokuapp.com/todos", {
+      fetch("https://rocky-anchorage-71862.herokuapp.com/todos", {
         method: "POST",
         body: JSON.stringify({
           name: obj.name,
