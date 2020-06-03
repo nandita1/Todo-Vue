@@ -1,12 +1,9 @@
 import Vue from "vue";
 import Vuex from "vuex";
 import axios from "axios";
-import {
-  v4 as uuidv4
-} from "uuid";
+import { v4 as uuidv4 } from "uuid";
 
 Vue.use(Vuex);
-
 
 function compare(a, b) {
   // Use toUpperCase() to ignore character casing
@@ -38,7 +35,7 @@ export const store = new Vuex.Store({
         }
       }
       //return state.todos.find(todo => todo.id === id)
-    }
+    },
   },
   mutations: {
     addTodo: (state, payload) => {
@@ -46,7 +43,8 @@ export const store = new Vuex.Store({
         id: uuidv4(),
         name: payload,
         completed: false,
-        loading: true
+        loading: true,
+        error: false,
       };
       state.todos.unshift(newTodo);
     },
@@ -54,21 +52,38 @@ export const store = new Vuex.Store({
       state.todos.splice(index, 1);
     },
     fetchTodos: (state, payload) => {
-      payload.sort(compare)
+      payload.sort(compare);
       state.todos = [...payload];
       //console.log(state.todos);
     },
     updateTodo: (state, payload) => {
       Vue.set(state.todos, 0, {
         ...payload,
-        loading: false
-      })
+        loading: false,
+      });
+    },
+    setError: (state) => {
+      console.log(state.todos);
+      Vue.set(state.todos, 0, {
+        ...state.todos[0],
+        loading: false,
+        error: true,
+      });
+    },
+    retry: (state, obj) => {
+      state.todos.splice(obj.index, 1);
+      const newTodo = {
+        id: uuidv4(),
+        name: obj.name,
+        completed: false,
+        loading: true,
+        error: false,
+      };
+      state.todos.unshift(newTodo);
     },
   },
   actions: {
-    fetchTodos: ({
-      commit
-    }) => {
+    fetchTodos: ({ commit }) => {
       axios
         .get("https://rocky-anchorage-71862.herokuapp.com/todos")
         .then((response) => {
@@ -79,42 +94,75 @@ export const store = new Vuex.Store({
           console.log(err);
         });
     },
-    addTodo: ({
-      commit
-    }, payload) => {
+    addTodo: ({ commit }, payload) => {
       commit("addTodo", payload);
-      fetch("https://rocky-anchorage-71862.herokuapp.com/todos", {
-          method: "POST",
-          body: JSON.stringify({
-            name: payload,
-            completed: false,
-          }),
-          headers: {
-            "Content-Type": "application/json",
-            // 'Content-Type': 'application/x-www-form-urlencoded',
-          },
+      fetch("http://rocky-anchorage-71862.herokuapp.com/todos", {
+        method: "POST",
+        body: JSON.stringify({
+          name: payload,
+          completed: false,
+        }),
+        headers: {
+          "Content-Type": "application/json",
+          // 'Content-Type': 'application/x-www-form-urlencoded',
+        },
+      })
+        .then((response) => {
+          console.log(response);
+          if (response.status !== 201) {
+            //commit("setError");
+            return Promise.reject("Error");
+          }
+          return response.json();
         })
-        .then((response) => response.json())
         .then((response) => {
           commit("updateTodo", response);
         })
         .catch((err) => {
+          commit("setError");
           console.log(err);
         });
     },
-    deleteTodo: ({
-      commit
-    }, obj) => {
+    deleteTodo: ({ commit }, obj) => {
       console.log(obj);
       commit("deleteTodo", obj.index);
       fetch("https://rocky-anchorage-71862.herokuapp.com/todos/" + obj.id, {
-          method: "DELETE",
-        })
+        method: "DELETE",
+      })
         .then((response) => response.json())
         .then((response) => {
           console.log(response);
         })
         .catch((err) => {
+          console.log(err);
+        });
+    },
+    retry: ({ commit }, obj) => {
+      commit("retry", obj);
+      fetch("http://rocky-anchorage-71862.herokuapp.com/todos", {
+        method: "POST",
+        body: JSON.stringify({
+          name: obj.name,
+          completed: false,
+        }),
+        headers: {
+          "Content-Type": "application/json",
+          // 'Content-Type': 'application/x-www-form-urlencoded',
+        },
+      })
+        .then((response) => {
+          console.log(response);
+          if (response.status !== 201) {
+            //commit("setError");
+            return Promise.reject("Error");
+          }
+          return response.json();
+        })
+        .then((response) => {
+          commit("updateTodo", response);
+        })
+        .catch((err) => {
+          commit("setError");
           console.log(err);
         });
     },

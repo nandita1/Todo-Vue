@@ -3,6 +3,7 @@
     <ul v-if="todos.length > 0">
       <li v-for="(todo, i) in todos" :key="i">
         <router-link
+          :style="todo.error ? 'color: red':''"
           :to="'/todo/' + todo.id"
           :class="[todo.loading ? 'disabled' : 'link']"
           :key="i"
@@ -13,7 +14,13 @@
         </router-link>
         <span>
           <img
+            v-if="todo.error"
             :style="todo.loading ? 'pointer-events: none': ''"
+            src="../assets/retry.svg"
+            @click="retry({name: todo.name, index: i})"
+          />
+          <img
+            :style="todo.loading|| todo.error ? 'pointer-events: none': ''"
             src="../assets/dustbin.svg"
             @click="deleteTodo({id: todo.id, index: i})"
           />
@@ -34,6 +41,10 @@ export default {
     deleteTodo(obj) {
       console.log(obj);
       this.$store.dispatch("deleteTodo", obj);
+    },
+    retry(obj) {
+      console.log(obj);
+      this.$store.dispatch("retry", obj);
     }
   }
 };
